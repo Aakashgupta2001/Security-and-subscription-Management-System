@@ -11,6 +11,15 @@ const appSchema = new mongoose.Schema({
     type: String,
     required: "App name is requred",
   },
+  subscriptionDet: {
+    type: [
+      {
+        duration: { type: String, required: true, enum: ["1 Month", "3 Month", "6 Month", "1 Year"] },
+        price: { type: Number, required: true },
+      },
+    ],
+    required: true,
+  },
   active: {
     type: Boolean,
     default: true,

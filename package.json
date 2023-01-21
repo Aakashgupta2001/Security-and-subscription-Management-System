@@ -1,0 +1,33 @@
+{
+  "name": "security-and-subscription-management-system",
+  "version": "1.0.0",
+  "description": "it contains users, subscription info for all the users along with their appCode that they are subscribed to in a single database",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aakashgupta2001/Security-and-subscription-Management-System.git"
+  },
+  "author": "Aakash Gupta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aakashgupta2001/Security-and-subscription-Management-System/issues"
+  },
+  "homepage": "https://github.com/Aakashgupta2001/Security-and-subscription-Management-System#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
+    "mongoose": "^6.8.3",
+    "nodemailer": "^6.9.0",
+    "nodemon": "^2.0.20"
+  }
+}

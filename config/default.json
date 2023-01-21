@@ -1,0 +1,13 @@
+{
+    "AWS_CONF"  : {
+      "bucket" : "megabox-storage",
+      "ACL" : "public-read",
+      "maxAge":"max-age=86400"},
+
+    "AWS_S3": {
+      "accessKeyId": "AKIASQ2G3OMQDTXYUSNA",
+      "secretAccessKey": "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",
+      "region": "ap-south-1"
+  }
+  }
+  

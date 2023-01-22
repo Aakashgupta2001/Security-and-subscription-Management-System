@@ -4,6 +4,7 @@ const { useErrorHandler } = require("../middlewares/errorHandler");
 
 const user = require("./user");
 const apps = require("./app");
+const subscription = require("./subscription");
 
 module.exports.default = (app) => {
   app.use(express.json());
@@ -12,6 +13,7 @@ module.exports.default = (app) => {
 
   app.use("/api/v1/user", user);
   app.use("/api/v1/app", apps);
+  app.use("/api/v1/subscription", subscription);
 
   app.use(useErrorHandler);
 };

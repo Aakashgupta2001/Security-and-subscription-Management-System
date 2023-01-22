@@ -45,21 +45,6 @@ exports.countDocuments = async (model, filter) => {
   return await model.countDocuments(filter);
 };
 
-// updates
-exports.findOneAndUpdate = async (model, filter, body) => {
-  return await model.findOneAndUpdate(filter, body, { new: true });
-};
-
-exports.findOneAndUpsert = async (model, filter, body) => {
-  return await model.findOneAndUpdate(filter, body, {
-    new: true,
-    upsert: true,
-    runValidators: true,
-    context: "query",
-    setDefaultsOnInsert: true,
-  });
-};
-
 exports.updateMany = async (model, filter, body) => {
   return await model.updateMany(filter, body, { new: true });
 };

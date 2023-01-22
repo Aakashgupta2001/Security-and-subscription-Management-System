@@ -68,7 +68,7 @@ exports.login = async (req, res, next) => {
       if (!app) throw new errorHandler.BadRequest("app not found");
       const token = await jwt.sign({ name: user.name, roles: user.roles, email: user.email, _id: user._id }, process.env.SECRET_KEY);
       const body = {
-        user: user.id,
+        user: user._id,
         app: req.headers.appid,
         token: [token],
         currentLogins: 1,

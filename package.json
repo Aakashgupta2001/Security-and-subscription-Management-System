@@ -28,6 +28,8 @@
     "moment": "^2.29.4",
     "mongoose": "^6.8.3",
     "nodemailer": "^6.9.0",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "razorpay": "^2.8.4",
+    "uuid": "^9.0.0"
   }
 }

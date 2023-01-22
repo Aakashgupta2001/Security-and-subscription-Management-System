@@ -19,7 +19,7 @@ const appSchema = new mongoose.Schema({
   subscriptionDet: {
     type: [
       {
-        duration: { type: String, required: true, enum: ["1 Month", "3 Month", "6 Month", "1 Year"] },
+        duration: { type: Number, required: true, enum: [1, 3, 6, 12] }, //months
         price: { type: Number, required: true },
       },
     ],

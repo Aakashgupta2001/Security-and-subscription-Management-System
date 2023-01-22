@@ -7,23 +7,8 @@ const subscriptionSchema = new mongoose.Schema(
       type: Schema.ObjectId,
       required: "user is required",
     },
-    app: Schema.ObjectId,
-    payments: [
-      {
-        razorpayOrderID: {
-          type: String,
-        },
-        paymentID: {
-          type: String,
-        },
-        paymentComplete: {
-          type: Boolean,
-          default: false,
-          required: true,
-        },
-        date: Date,
-      },
-    ],
+    app: { type: Schema.ObjectId, required: true },
+    payments: [{ type: mongoose.Schema.ObjectId, ref: "payments" }],
     expiry: {
       type: Date,
       required: "expiry date is required",

@@ -5,16 +5,19 @@ exports.sendEmail = async (req, res, next) => {
   //   AWS.config.update(config.get("AWS_SES"));
   try {
     // const ses = new AWS.SES();
-    var transporter = nodemailer.createTransport({
-      service: "gmail",
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: 465,
+      secure: true, // true for 465, false for other ports
       auth: {
-        user: process.env.googleEmail,
-        pass: process.env.googlePass,
+        user: process.env.MAIL_USER, // generated ethereal user
+        pass: process.env.MAIL_PASS, // generated ethereal password
       },
     });
     console.log(transporter.transporter.auth);
     const params = {
-      from: process.env.fromEmail,
+      from: process.env.MAIL_FROM,
       to: req.email.addresses,
       // CcAddresses: req.email.ccAddresses ? req.email.ccAddresses : null,
       html: req.email.body,

@@ -4,8 +4,13 @@ Schema = mongoose.Schema;
 const appSchema = new mongoose.Schema({
   appCode: {
     type: String,
-    required: "email is required",
+    required: "appCode is required",
     unique: true,
+  },
+  maxLogins: {
+    type: Number,
+    required: true,
+    default: 0,
   },
   appName: {
     type: String,

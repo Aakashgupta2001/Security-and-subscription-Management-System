@@ -1,4 +1,6 @@
 const userModel = require("../models/user");
+const loginModel = require("../models/logins");
+const appModel = require("../models/apps");
 const service = require("../service/mongoService");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -43,7 +45,7 @@ exports.signup = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    if (!req.body || !req.body.email || !req.body.password) {
+    if (!req.body || !req.body.email || !req.body.password || !req.headers.appid) {
       throw new errorHandler.BadRequest("error bad request");
     }
     const filter = {
@@ -58,17 +60,62 @@ exports.login = async (req, res, next) => {
     if (!result) {
       throw new errorHandler.BadRequest("Incorrect Password");
     }
-    const token = await jwt.sign({ name: user.name, roles: user.roles, email: user.email, _id: user._id }, process.env.SECRET_KEY);
-    responseHandler(
-      {
-        token: token,
-        name: user.name,
-        email: user.email,
-        roles: user.roles,
-      },
-      res,
-      "Signin Successful"
-    );
+
+    const logins = await service.findOne(loginModel, { user: user.id, app: req.headers.appid }, {}, "app");
+
+    if (!logins) {
+      const app = await service.findOne(appModel, { _id: req.headers.appid });
+      if (!app) throw new errorHandler.BadRequest("app not found");
+      const token = await jwt.sign({ name: user.name, roles: user.roles, email: user.email, _id: user._id }, process.env.SECRET_KEY);
+      const body = {
+        user: user.id,
+        app: req.headers.appid,
+        token: [token],
+        currentLogins: 1,
+      };
+      await service.create(loginModel, body);
+      return responseHandler(
+        {
+          token: token,
+          name: user.name,
+          email: user.email,
+          roles: user.roles,
+        },
+        res,
+        "Signin Successful"
+      );
+    } else if (logins.currentLogins >= logins.app.maxLogins) {
+      logins.currentLogins = 1;
+
+      const token = await jwt.sign({ name: user.name, roles: user.roles, email: user.email, _id: user._id }, process.env.SECRET_KEY);
+      logins.token = [token];
+      logins.save();
+      return responseHandler(
+        {
+          token: token,
+          name: user.name,
+          email: user.email,
+          roles: user.roles,
+        },
+        res,
+        "Signin Successful (Logged out of all other devices)"
+      );
+    } else {
+      logins.currentLogins += 1;
+      const token = await jwt.sign({ name: user.name, roles: user.roles, email: user.email, _id: user._id }, process.env.SECRET_KEY);
+      logins.token.push(token);
+      logins.save();
+      return responseHandler(
+        {
+          token: token,
+          name: user.name,
+          email: user.email,
+          roles: user.roles,
+        },
+        res,
+        "Signin Successful"
+      );
+    }
   } catch (err) {
     next(err);
   }

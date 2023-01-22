@@ -34,13 +34,13 @@ const useErrorHandler = (err, req, res, next) => {
   if (err instanceof GeneralError) {
     return res.status(err.getCode()).json({
       status: "error",
-      message: err.message,
+      message: typeof err.message == "string" ? err.message : err.message.message,
     });
   }
 
   return res.status(400).json({
     status: "error",
-    message: err.message,
+    message: typeof err.message == "string" ? err.message : err.message.message,
   });
 };
 

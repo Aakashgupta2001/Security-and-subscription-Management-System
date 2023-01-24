@@ -16,6 +16,9 @@ const appSchema = new mongoose.Schema({
     type: String,
     required: "App name is requred",
   },
+  trialPeriod: {
+    Number,
+  },
   subscriptionDet: {
     type: [
       {

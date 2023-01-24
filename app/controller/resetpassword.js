@@ -11,6 +11,8 @@ const emailer = require("../../config/static/emailTemplates");
 module.exports.resetPassword = async (req, res, next) => {
   try {
     const email = req.body.email;
+    const app = req.headers.appid;
+    if (!app) throw new error.BadRequest("appid required");
     const user = await service.findOne(userModel, { email: email }); //checking if the email address sent by client is present in the db(valid)
     console.log(user);
     if (!user) {
@@ -19,7 +21,7 @@ module.exports.resetPassword = async (req, res, next) => {
     await service.findOneAndHardDelete(resetModel, { email: user.email });
     let token = crypto.randomBytes(32).toString("hex");
     let hash = await bcrypt.hash(token, 10);
-    let item = await service.create(resetModel, { email: user.email, resetToken: hash, expire: moment.utc().add(5146, "seconds") });
+    let item = await service.create(resetModel, { email: user.email, resetToken: hash, app, expire: moment.utc().add(5146, "seconds") });
     req.email = emailer.forgotPassword(item.resetToken, user.name, [user.email]);
     console.log(item);
     req.finals = "Forgot Password Email Sent Successfully";
@@ -33,8 +35,10 @@ module.exports.storePassword = async (req, res, next) => {
   try {
     const email = req.body.email;
     const token = req.body.token;
-    const password = req.body.password;
-    let resetPassword = await service.findOne(resetModel, { email: email, status: 0 });
+    const app = req.headers.appid;
+    if (!app) throw new error.BadRequest("appid required");
+
+    let resetPassword = await service.findOne(resetModel, { email: email, app, status: 0 });
     if (!resetPassword) {
       throw new error.ApplicationError("Reset password token not found");
     }
@@ -42,12 +46,19 @@ module.exports.storePassword = async (req, res, next) => {
     if (!tokenMatch) {
       throw new error.ApplicationError("Incorrect token");
     }
-    let hash = await bcrypt.hash(password, 10);
-    let updateUser = await service.findOneAndUpdate(userModel, { email: email }, { $set: { password: hash } });
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(req.body.password, salt);
+    let user = await service.findOne(userModel, { email: email });
+    let password = user.creds.map((pass) => {
+      if (pass.app == app) return { password: hash, appid: app };
+      return pass;
+    });
+
+    let updateUser = await service.update(userModel, { email: email }, { password });
     if (!updateUser) {
       throw new error.ApplicationError("Error while updating user in db");
     }
-    await service.findOneAndUpdate(resetModel, { _id: resetPassword.id }, { $inc: { status: 1 } });
+    await service.update(resetModel, { _id: resetPassword.id }, { $inc: { status: 1 } });
     req.email = emailer.passwordUpdated(updateUser.name, [email]);
     req.finals = "Password Updated Successfully";
     next();

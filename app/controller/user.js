@@ -1,6 +1,7 @@
 const userModel = require("../models/user");
 const loginModel = require("../models/logins");
 const appModel = require("../models/apps");
+const subscriptionModel = require("../models/subscription");
 const service = require("../service/mongoService");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -14,31 +15,78 @@ exports.signup = async (req, res, next) => {
     const existingUser = await service.findOne(userModel, {
       email: req.body.email,
     });
-    if (existingUser) {
+    if (!req.headers.appid) return res.status(406).send("App Required");
+    const appId = req.headers.appid;
+    const app = await service.findOne(appModel, { _id: appId });
+    if (!app) {
+      throw new errorHandler.BadRequest("Invalid App");
+    }
+    if (
+      existingUser &&
+      existingUser.creds.find((cred) => {
+        if (cred.appid == appId) return true;
+      })
+    ) {
       throw new errorHandler.BadRequest("User already exist");
     }
+
     let body = req.body;
     if (body.name && !body.userName) {
       body.userName = body.name;
     }
-    11;
+
     if (!body.password || body.password.length < 5) {
       return res.status(406).send("Password required");
     }
+
     body.email = body.email.toLowerCase();
 
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(body.password, salt);
-    body.password = hashPassword;
-
-    const user = await service.create(userModel, body);
-    let returnBody = {
-      email: user.email,
-      name: user.name,
-      role: user.roles,
-    };
-    return responseHandler(returnBody, res);
+    delete body.password;
+    let user;
+    if (existingUser) {
+      existingUser.creds.push({
+        appid: appId,
+        password: hashPassword,
+      });
+      body["creds"] = existingUser.creds;
+      console.log(body);
+      user = await service.update(userModel, { _id: existingUser._id }, body);
+      let returnBody = {
+        email: user.email,
+        name: user.name,
+        role: user.roles,
+      };
+      responseHandler(returnBody, res);
+    } else {
+      body["creds"] = [
+        {
+          appid: appId,
+          password: hashPassword,
+        },
+      ];
+      user = await service.create(userModel, body);
+      let returnBody = {
+        email: user.email,
+        name: user.name,
+        role: user.roles,
+      };
+      responseHandler(returnBody, res);
+    }
+    console.log("sadasondason");
+    let today = new Date();
+    if (app.trialPeriod > 0) {
+      const subscriptionBody = {
+        user: user._id,
+        app: appId,
+        expiry: today.setMonth(today.getMonth() + +app.trialPeriod),
+      };
+      let subscription = await service.create(subscriptionModel, subscriptionBody);
+      console.log(subscription);
+    }
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -55,8 +103,10 @@ exports.login = async (req, res, next) => {
     if (!user) {
       throw new errorHandler.BadRequest("User does not exist");
     }
+    const userCreds = await user.creds.find((cred) => cred.appid == req.headers.appid);
+    if (!userCreds) throw new errorHandler.BadRequest("User does not exist");
 
-    const result = await bcrypt.compare(req.body.password, user.password);
+    const result = await bcrypt.compare(req.body.password, userCreds.password);
     if (!result) {
       throw new errorHandler.BadRequest("Incorrect Password");
     }

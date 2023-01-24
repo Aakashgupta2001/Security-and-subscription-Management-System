@@ -6,6 +6,10 @@ const resetPasswordSchema = new mongoose.Schema(
     userId: {
       type: Schema.ObjectId,
     },
+    app: {
+      type: Schema.ObjectId,
+      required: true,
+    },
     email: {
       type: String,
       trim: true,

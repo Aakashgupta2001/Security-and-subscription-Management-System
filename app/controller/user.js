@@ -126,6 +126,7 @@ exports.login = async (req, res, next) => {
       await service.create(loginModel, body);
       return responseHandler(
         {
+          id: user._id,
           token: token,
           name: user.name,
           email: user.email,
@@ -142,6 +143,7 @@ exports.login = async (req, res, next) => {
       logins.save();
       return responseHandler(
         {
+          id: user._id,
           token: token,
           name: user.name,
           email: user.email,
@@ -157,6 +159,7 @@ exports.login = async (req, res, next) => {
       logins.save();
       return responseHandler(
         {
+          id: user._id,
           token: token,
           name: user.name,
           email: user.email,
@@ -168,6 +171,18 @@ exports.login = async (req, res, next) => {
     }
   } catch (err) {
     next(err);
+  }
+};
+
+exports.logout = async (req, res, next) => {
+  try {
+    const user = req.body.user;
+    const logins = await service.findOne(loginModel, { user: user.id });
+    const newTokens = logins.token.filter((x) => x !== user.token);
+    const newLogin = await service.update(loginModel, { user: user.id }, { token: newTokens, currentLogins: logins.currentLogins - 1 });
+    return responseHandler(newLogin, res);
+  } catch (error) {
+    next(error);
   }
 };
 

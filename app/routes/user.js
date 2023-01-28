@@ -5,6 +5,7 @@ const auth = require("../middlewares/auth");
 const { sendEmail } = require("../middlewares/sendEmail");
 
 router.route("/login").post(userController.login);
+router.route("/logout").post(userController.logout);
 router.route("/signup").post(userController.signup);
 
 router.route("/list").get(auth.verifyToken, auth.isAdmin, userController.getUserListBasedOnRole);

@@ -22,7 +22,7 @@ module.exports.resetPassword = async (req, res, next) => {
     let token = crypto.randomBytes(32).toString("hex");
     let hash = await bcrypt.hash(token, 10);
     let item = await service.create(resetModel, { email: user.email, resetToken: hash, app, expire: moment.utc().add(5146, "seconds") });
-    req.email = emailer.forgotPassword(item.resetToken, user.name, [user.email]);
+    req.email = emailer.forgotPassword(item.resetToken, user.name, [user.email], app);
     console.log(item);
     req.finals = "Forgot Password Email Sent Successfully";
     next();
@@ -36,6 +36,7 @@ module.exports.storePassword = async (req, res, next) => {
     const email = req.body.email;
     const token = req.body.token;
     const app = req.headers.appid;
+    console.log(app);
     if (!app) throw new error.BadRequest("appid required");
 
     let resetPassword = await service.findOne(resetModel, { email: email, app, status: 0 });
@@ -48,18 +49,21 @@ module.exports.storePassword = async (req, res, next) => {
     }
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(req.body.password, salt);
+    console.log(req.body.password, hash);
     let user = await service.findOne(userModel, { email: email });
     let password = user.creds.map((pass) => {
-      if (pass.app == app) return { password: hash, appid: app };
+      if (pass.appid == app) return { password: hash, appid: app };
       return pass;
     });
+    console.log(password);
 
-    let updateUser = await service.update(userModel, { email: email }, { password });
+    let updateUser = await service.update(userModel, { email: email }, { creds: password });
     if (!updateUser) {
       throw new error.ApplicationError("Error while updating user in db");
     }
-    await service.update(resetModel, { _id: resetPassword.id }, { $inc: { status: 1 } });
-    req.email = emailer.passwordUpdated(updateUser.name, [email]);
+    const a = await service.increase(resetModel, { _id: resetPassword._id }, { $inc: { status: 1 } });
+    console.log(a);
+    // req.email = emailer.passwordUpdated(updateUser.name, [email]);
     req.finals = "Password Updated Successfully";
     next();
   } catch (err) {

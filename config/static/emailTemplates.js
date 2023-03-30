@@ -5,15 +5,19 @@ const emailSignature = () =>
   <br>Woobblr,<br>
   </body>`;
 
-const logo = `<img width="50px" src="https://play-lh.googleusercontent.com/2s64J-TkjEX2pnYn7hDaPV4IxewgPUR9eUvp-Py0UYVPXEuvUhoxVoD18bsYzZup_Q" alt="" /> <br>`;
+const logo = `<img width="50px" src="https://woobblr.co.in/wp-content/uploads/2023/01/cropped-Woobblr_Logo.png" alt="" /> <br>`;
 
-const forgotPassword = (token, name, email) => {
+const forgotPassword = (token, name, email, appid) => {
   return {
     body: `<body>${logo} Hi ${name},<br>There was a request to change your password! <br>
 If you did not make this request then please ignore this email.
 Otherwise, please click below button to change your password: 
 <br>
-<button><a href="${process.env.CLIENT_URL}/resetPassword?token=${token}&email=${email}"> Reset Password </a></button>
+<button><a href="${process.env.CLIENT_URL}/resetPassword?token=${token}&email=${email}&appid=${appid}"> Reset Password </a></button>
+If you are not able to click on the button, pls paste this link in your browser --> <br>
+<a href = "${process.env.CLIENT_URL}/resetPassword?token=${token}&email=${email}&appid=${appid}">
+${process.env.CLIENT_URL}/resetPassword?token=${token}&email=${email}&appid=${appid}
+</a>
 
 ${emailSignature()}`,
     addresses: email,

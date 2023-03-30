@@ -18,7 +18,10 @@ exports.upsert = async (model, filter, body) => {
     }
   );
 };
+
 exports.update = async (model, filter, body) => {
+  const a = { $set: { ...body } };
+  console.log("asdas", a);
   return await model.findOneAndUpdate(
     filter,
     { $set: { ...body } },
@@ -30,6 +33,18 @@ exports.update = async (model, filter, body) => {
       // runValidators:true,
     }
   );
+};
+
+exports.increase = async (model, filter, body) => {
+  const a = { $set: { ...body } };
+  console.log("asdas", a);
+  return await model.findOneAndUpdate(filter, body, {
+    new: true,
+    upsert: false,
+    runValidators: true,
+    context: "query",
+    // runValidators:true,
+  });
 };
 
 // find and filter

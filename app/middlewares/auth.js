@@ -47,6 +47,7 @@ module.exports.subscriptionCheck = async (req, res, next) => {
   try {
     const subscription = await service.findOne(subscriptionModel, { app: req.headers.appid, user: req.user._id });
     console.log(subscription);
+    if (!subscription) throw new error.BadRequest("Subscription Expired");
     console.log(subscription.expiry < new Date());
     if (subscription.expiry < new Date()) {
       throw new error.BadRequest("Subscription Expired");

@@ -125,6 +125,7 @@ exports.login = async (req, res, next) => {
 
     const logins = await service.findOne(loginModel, { user: user.id, app: req.headers.appid }, {}, "app");
     console.log(userCreds.isFirstLogin, userCreds);
+    console.log(logins);
 
     if (!logins) {
       const app = await service.findOne(appModel, { _id: req.headers.appid });
@@ -194,9 +195,13 @@ exports.login = async (req, res, next) => {
 exports.logout = async (req, res, next) => {
   try {
     const user = req.body.user;
-    const logins = await service.findOne(loginModel, { user: user.id });
+    const logins = await service.findOne(loginModel, { user: user.id, app: req.headers.appid });
     const newTokens = logins.token.filter((x) => x !== user.token);
-    const newLogin = await service.update(loginModel, { user: user.id }, { token: newTokens, currentLogins: logins.currentLogins - 1 });
+    const newLogin = await service.update(
+      loginModel,
+      { user: user.id, app: req.headers.appid },
+      { token: newTokens, currentLogins: logins.currentLogins - 1 }
+    );
     return responseHandler(newLogin, res);
   } catch (error) {
     next(error);

@@ -49,6 +49,7 @@ exports.signup = async (req, res, next) => {
       existingUser.creds.push({
         appid: appId,
         password: hashPassword,
+        isFirstLogin: true,
       });
       body["creds"] = existingUser.creds;
       console.log(body);
@@ -64,6 +65,7 @@ exports.signup = async (req, res, next) => {
         {
           appid: appId,
           password: hashPassword,
+          isFirstLogin: true,
         },
       ];
       user = await service.create(userModel, body);
@@ -85,6 +87,16 @@ exports.signup = async (req, res, next) => {
       let subscription = await service.create(subscriptionModel, subscriptionBody);
       console.log(subscription);
     }
+    // else if (app.trialPeriod == -1) {
+    //   const subscriptionBody = {
+    //     user: user._id,
+    //     app: appId,
+    //     expiry: today.setMonth(today.getMonth() + +app.trialPeriod),
+    //     noExpiry: true,
+    //   };
+    //   let subscription = await service.create(subscriptionModel, subscriptionBody);
+    //   console.log(subscription);
+    // }
   } catch (err) {
     console.log(err);
     next(err);
@@ -112,6 +124,7 @@ exports.login = async (req, res, next) => {
     }
 
     const logins = await service.findOne(loginModel, { user: user.id, app: req.headers.appid }, {}, "app");
+    console.log(userCreds.isFirstLogin, userCreds);
 
     if (!logins) {
       const app = await service.findOne(appModel, { _id: req.headers.appid });
@@ -124,12 +137,14 @@ exports.login = async (req, res, next) => {
         currentLogins: 1,
       };
       await service.create(loginModel, body);
+
       return responseHandler(
         {
           id: user._id,
           token: token,
           name: user.name,
           email: user.email,
+          isFirstLogin: userCreds.isFirstLogin,
           roles: user.roles,
         },
         res,
@@ -147,6 +162,7 @@ exports.login = async (req, res, next) => {
           token: token,
           name: user.name,
           email: user.email,
+          isFirstLogin: userCreds.isFirstLogin,
           roles: user.roles,
         },
         res,
@@ -163,6 +179,7 @@ exports.login = async (req, res, next) => {
           token: token,
           name: user.name,
           email: user.email,
+          isFirstLogin: userCreds.isFirstLogin,
           roles: user.roles,
         },
         res,

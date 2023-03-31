@@ -1,6 +1,7 @@
 const subscriptionModel = require("../models/subscription");
 const appModel = require("../models/apps");
 const paymentModel = require("../models/payments");
+const userModel = require("../models/user");
 const mongoService = require("../service/mongoService");
 const { responseHandler } = require("../middlewares/response-handler");
 const errorHandler = require("../middlewares/errorHandler");
@@ -27,9 +28,13 @@ exports.newpayment = async (req, res, next) => {
     body.razorpayOrderID = order.id;
     body.receipt = order.receipt;
     body.amount = appSubInfo.price;
+    if (app.trialPeriod == -1) {
+      body.subDuration = -1;
+    }
     const payment = await mongoService.create(paymentModel, body);
     return responseHandler(payment, res);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -51,7 +56,9 @@ exports.verify = async (req, res, next) => {
     let set = {};
     set["paymentID"] = paymentID;
     const payments = await mongoService.update(paymentModel, filter, set);
-    if (payments.paymentComplete) throw new errorHandler.BadRequest("Subscription Already Added");
+
+    // if (payments.paymentComplete) throw new errorHandler.BadRequest("Subscription Already Added");
+
     payments["paymentComplete"] = true;
     payments.save();
 
@@ -60,7 +67,9 @@ exports.verify = async (req, res, next) => {
     if (subscription) {
       subscription.payments.push(payments._id);
       subscription.expiry = subscription.expiry.setMonth(subscription.expiry.getMonth() + +payments.subDuration);
-      console.log(subscription.expiry);
+      if (payments.subDuration == -1) {
+        subscription.noExpiry = true;
+      }
       subscription = await mongoService.update(subscriptionModel, { user: req.user._id, app: req.headers.appid }, subscription);
     } else {
       let today = new Date();
@@ -70,12 +79,23 @@ exports.verify = async (req, res, next) => {
         payments: payments._id,
         expiry: new Date(today.setMonth(today.getMonth() + +payments.subDuration)),
       };
-      console.log(subscriptionBody);
+      if (payments.subDuration == -1) {
+        subscriptionBody.noExpiry = true;
+      }
       subscription = await mongoService.create(subscriptionModel, subscriptionBody);
     }
 
-    return responseHandler(subscription, res);
+    responseHandler(subscription, res);
+
+    const user = await mongoService.findOne(userModel, { _id: req.user._id });
+    user.creds = await user.creds.map((cred) => {
+      if (cred.appid == req.headers.appid) return { ...cred, isFirstLogin: false };
+      return cred;
+    });
+    console.log(user.creds);
+    user.save();
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

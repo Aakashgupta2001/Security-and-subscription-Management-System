@@ -13,6 +13,10 @@ const subscriptionSchema = new mongoose.Schema(
       type: Date,
       required: "expiry date is required",
     },
+    noExpiry: {
+      type: Boolean,
+      default: false,
+    },
     active: {
       type: Boolean,
       default: true,

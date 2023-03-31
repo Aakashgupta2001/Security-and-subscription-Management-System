@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const error = require("../middlewares/errorHandler");
 const loginModel = require("../models/logins");
 const subscriptionModel = require("../models/subscription");
+const userModel = require("../models/user");
 const service = require("../service/mongoService");
 const { responseHandler } = require("./response-handler");
 
@@ -46,6 +47,16 @@ module.exports.verifyToken = async function (req, res, next) {
 module.exports.subscriptionCheck = async (req, res, next) => {
   try {
     const subscription = await service.findOne(subscriptionModel, { app: req.headers.appid, user: req.user._id });
+
+    const user = await service.findOne(userModel, { _id: req.user._id });
+    const appCred = await user.creds.find((cred) => {
+      if (cred.appid == req.headers.appid) return cred;
+      return cred;
+    });
+
+    if (subscription.noExpiry && !appCred.isFirstLogin) {
+      return responseHandler(subscription, res);
+    }
     console.log(subscription);
     if (!subscription) throw new error.BadRequest("Subscription Expired");
     console.log(subscription.expiry < new Date());

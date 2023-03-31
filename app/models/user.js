@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
       {
         appid: Schema.ObjectId,
         password: String,
+        isFirstLogin: Boolean,
       },
     ],
     required: true,

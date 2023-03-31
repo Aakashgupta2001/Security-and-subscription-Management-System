@@ -57,7 +57,7 @@ exports.verify = async (req, res, next) => {
     set["paymentID"] = paymentID;
     const payments = await mongoService.update(paymentModel, filter, set);
 
-    // if (payments.paymentComplete) throw new errorHandler.BadRequest("Subscription Already Added");
+    if (payments.paymentComplete) throw new errorHandler.BadRequest("Subscription Already Added");
 
     payments["paymentComplete"] = true;
     payments.save();

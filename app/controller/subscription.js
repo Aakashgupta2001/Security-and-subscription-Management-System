@@ -22,6 +22,9 @@ exports.newpayment = async (req, res, next) => {
         return sub;
       }
     });
+    if (!appSubInfo) {
+      throw new errorHandler.BadRequest("Subscription Duration MisMatch");
+    }
     if (+appSubInfo.price !== +body.amount) throw new errorHandler.BadRequest("Amount MisMatch");
     console.log(appSubInfo);
     const order = await razorpay.createOrder(appSubInfo.price, "INR", uuidv4(), {});

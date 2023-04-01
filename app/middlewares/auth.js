@@ -47,7 +47,9 @@ module.exports.verifyToken = async function (req, res, next) {
 module.exports.subscriptionCheck = async (req, res, next) => {
   try {
     const subscription = await service.findOne(subscriptionModel, { app: req.headers.appid, user: req.user._id });
-
+    if (!subscription) {
+      throw new error.BadRequest("Subscription Expired");
+    }
     const user = await service.findOne(userModel, { _id: req.user._id });
     const appCred = await user.creds.find((cred) => {
       if (cred.appid == req.headers.appid) return cred;
@@ -65,6 +67,7 @@ module.exports.subscriptionCheck = async (req, res, next) => {
     }
     return responseHandler(subscription, res);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

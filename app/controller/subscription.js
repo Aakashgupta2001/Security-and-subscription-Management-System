@@ -13,6 +13,11 @@ exports.newpayment = async (req, res, next) => {
     const body = req.body;
     if (!body.amount || !body.subDuration) throw new errorHandler.BadRequest("Bad Request");
 
+    const existingPayment = await mongoService.findOne(paymentModel, { app: req.headers.appid, user: req.user._id, paymentComplete: true });
+    if (existingPayment && existingPayment?.subDuration == -1) {
+      throw new errorHandler.BadRequest("Payment Already Completed");
+    }
+
     body["user"] = req.user._id;
     body["app"] = req.headers.appid;
     const app = await mongoService.findOne(appModel, { _id: body.app });

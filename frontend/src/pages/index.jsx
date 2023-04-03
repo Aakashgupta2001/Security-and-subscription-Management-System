@@ -1,3 +1,4 @@
 import ResetPassword from "./ResetPassword";
+import Payment from "./payment";
 
-export { ResetPassword };
+export { ResetPassword, Payment };

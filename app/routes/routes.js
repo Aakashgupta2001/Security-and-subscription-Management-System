@@ -29,6 +29,9 @@ module.exports.default = (app) => {
   app.get("/resetPassword", (req, res, next) => {
     res.sendFile(getDir() + "/build/index.html");
   });
+  app.get("/payment", (req, res, next) => {
+    res.sendFile(getDir() + "/build/index.html");
+  });
 
   app.use(useErrorHandler);
 };

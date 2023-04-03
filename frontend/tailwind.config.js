@@ -1,6 +1,3 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
-import img from "./src/assets/img/background.jpg";
-
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {

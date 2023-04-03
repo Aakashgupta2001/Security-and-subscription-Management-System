@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ResetPassword, Payment } from "../pages";
+import { ResetPassword, Payment, AboutUs, ContactUs, Home, PrivacyPolicy, RefundPolicy, TermsOfService } from "../pages";
 import { connect } from "react-redux";
 
 const Routers = (props) => {
@@ -9,6 +9,12 @@ const Routers = (props) => {
       <Routes>
         <Route path="/resetPassword/*" element={<ResetPassword />}></Route>
         <Route path="/Payment/*" element={<Payment />}></Route>
+        <Route path="*" element={<Home />}></Route>
+        <Route path="/PrivacyPolicy" element={<PrivacyPolicy />}></Route>
+        <Route path="/RefundPolicy" element={<RefundPolicy />}></Route>
+        <Route path="/TermsOfService" element={<TermsOfService />}></Route>
+        <Route path="/ContactUs" element={<ContactUs />}></Route>
+        <Route path="/AboutUs" element={<AboutUs />}></Route>
       </Routes>
     </BrowserRouter>
   );

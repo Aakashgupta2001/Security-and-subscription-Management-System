@@ -55,9 +55,9 @@ module.exports.subscriptionCheck = async (req, res, next) => {
       if (cred.appid == req.headers.appid) return cred;
       return cred;
     });
-
+    const response = { expiry: subscription.expiry, noExpiry: subscription.noExpiry, user: { ...req.user } };
     if (subscription.noExpiry && !appCred.isFirstLogin) {
-      return responseHandler(subscription, res);
+      return responseHandler(response, res);
     }
     console.log(subscription);
     if (!subscription) throw new error.BadRequest("Subscription Expired");
@@ -65,7 +65,7 @@ module.exports.subscriptionCheck = async (req, res, next) => {
     if (subscription.expiry < new Date()) {
       throw new error.BadRequest("Subscription Expired");
     }
-    return responseHandler(subscription, res);
+    return responseHandler(response, res);
   } catch (error) {
     console.log(error);
     next(error);

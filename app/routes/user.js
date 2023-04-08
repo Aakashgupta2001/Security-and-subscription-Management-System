@@ -11,6 +11,8 @@ router.route("/signup").post(userController.signup);
 router.route("/list").get(auth.verifyToken, auth.isAdmin, userController.getUserListBasedOnRole);
 router.route("/role/:id").put(auth.verifyToken, auth.isAdmin, userController.updateRole);
 
+router.route("/password/verify").post(auth.verifyToken, userController.verifyPassword);
+
 router.route("/password/forgot").post(resetPasswordController.resetPassword, sendEmail);
 router.route("/password/reset").post(resetPasswordController.storePassword, sendEmail);
 

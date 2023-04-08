@@ -192,6 +192,39 @@ exports.login = async (req, res, next) => {
   }
 };
 
+exports.verifyPassword = async (req, res, next) => {
+  try {
+    if (!req.body || !req.body.password || !req.headers.appid) {
+      throw new errorHandler.BadRequest("error bad request");
+    }
+    const filter = {
+      _id: req.user._id,
+    };
+    const user = await service.findOne(userModel, filter);
+    if (!user) {
+      throw new errorHandler.BadRequest("User does not exist");
+    }
+    const userCreds = await user.creds.find((cred) => cred.appid == req.headers.appid);
+    if (!userCreds) throw new errorHandler.BadRequest("User does not exist");
+
+    const result = await bcrypt.compare(req.body.password, userCreds.password);
+    if (!result) {
+      throw new errorHandler.BadRequest("Incorrect Password");
+    }
+    return responseHandler(
+      {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      res,
+      "Password Validated"
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.logout = async (req, res, next) => {
   try {
     const user = req.body.user;

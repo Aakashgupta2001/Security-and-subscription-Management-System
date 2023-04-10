@@ -5,6 +5,8 @@ const auth = require("../middlewares/auth");
 router.route("/").post(auth.verifyToken, auth.isAdmin, appController.create);
 router.route("/").get(auth.verifyToken, auth.isAdmin, appController.list);
 
+router.route("/:id").get(auth.verifyToken, appController.findByID);
+
 router.route("/:id").put(auth.verifyToken, auth.isAdmin, appController.update);
 
 module.exports = router;

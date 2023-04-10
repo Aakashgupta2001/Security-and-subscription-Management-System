@@ -41,6 +41,16 @@ exports.list = async (req, res, next) => {
   }
 };
 
+exports.findByID = async (req, res, next) => {
+  try {
+    const filter = { _id: req.params.id };
+    const app = await mongoService.findOne(appModel, filter);
+    return responseHandler(app, res);
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.update = async (req, res, next) => {
   try {
     const filter = { _id: req.params.id };

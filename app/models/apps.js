@@ -23,6 +23,7 @@ const appSchema = new mongoose.Schema({
     type: [
       {
         duration: { type: Number, required: true, enum: [-1, 1, 3, 6, 12] }, //months
+        description: String,
         price: { type: Number, required: true },
       },
     ],

@@ -43,7 +43,7 @@ const Payment = (props) => {
     }
 
     var options = {
-      key: "rzp_test_wt6RbeHEP9lvpC",
+      key: "rzp_live_E0wOqQG90QkJUx",
       amount: amount,
       currency: "INR",
       name: urlParams.appname,

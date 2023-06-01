@@ -29,6 +29,23 @@ module.exports.default = (app) => {
   app.get("/resetPassword", (req, res, next) => {
     res.sendFile(getDir() + "/build/index.html");
   });
+
+  app.get("/RefundPolicy", (req, res, next) => {
+    res.sendFile(getDir() + "/build/index.html");
+  });
+  app.get("/PrivacyPolicy", (req, res, next) => {
+    res.sendFile(getDir() + "/build/index.html");
+  });
+  app.get("/termsOfService", (req, res, next) => {
+    res.sendFile(getDir() + "/build/index.html");
+  });
+  app.get("/AboutUs", (req, res, next) => {
+    res.sendFile(getDir() + "/build/index.html");
+  });
+  app.get("/ContactUs", (req, res, next) => {
+    res.sendFile(getDir() + "/build/index.html");
+  });
+
   app.get("/payment", (req, res, next) => {
     res.sendFile(getDir() + "/build/index.html");
   });

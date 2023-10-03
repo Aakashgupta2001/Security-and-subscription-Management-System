@@ -43,7 +43,7 @@ const Payment = (props) => {
     }
 
     var options = {
-      key: "rzp_live_E0wOqQG90QkJUx",
+      key: "rzp_test_NZWpkoUJ89sqzi",
       amount: amount,
       currency: "INR",
       name: urlParams.appname,
@@ -77,7 +77,7 @@ const Payment = (props) => {
   const verifyOrder = (params) => {
     axios({
       //   url: `${Config.apiBaseUrl}/subscription/verify`, //your url
-      url: `https://woobblr-sso-fsle7qxuxa-el.a.run.app/api/v1/subscription/verify`, //your url
+      url: `http://localhost:3001/api/v1/subscription/verify`, //your url
       // url: "https://stupendous-coordinated-rotate.glitch.me/convert", //your url
       method: "POST",
       headers: {
@@ -111,7 +111,7 @@ const Payment = (props) => {
       !paymentSuccess &&
         axios({
           // url: `${Config.apiBaseUrl}/subscription`, //your url
-          url: `https://woobblr-sso-fsle7qxuxa-el.a.run.app/api/v1/subscription`, //your url
+          url: `http://localhost:3001/api/v1/subscription`, //your url
           // url: "https://stupendous-coordinated-rotate.glitch.me/convert", //your url
           method: "POST",
           headers: {

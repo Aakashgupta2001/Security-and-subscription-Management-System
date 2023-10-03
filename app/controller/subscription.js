@@ -20,6 +20,7 @@ exports.newpayment = async (req, res, next) => {
 
     body["user"] = req.user._id;
     body["app"] = req.headers.appid;
+    console.log("body ===> ", body);
     const app = await mongoService.findOne(appModel, { _id: body.app });
     if (!app) throw new errorHandler.BadRequest("Bad Request");
     let appSubInfo = await app.subscriptionDet.find((sub) => {

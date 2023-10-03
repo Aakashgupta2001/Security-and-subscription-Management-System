@@ -40,6 +40,7 @@ module.exports.verifyToken = async function (req, res, next) {
       throw new error.Unauthorized("Unauthorized");
     }
   } catch (ex) {
+    console.log("token validation failed");
     next(ex);
   }
 };
